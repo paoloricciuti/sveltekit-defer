@@ -2,16 +2,16 @@ name: Run Lint
 on:
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-      - run: npm install
-      - run: npm lint
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+    - run: pnpm install
+    - run: pnpm run lint
     # - run: npm test
