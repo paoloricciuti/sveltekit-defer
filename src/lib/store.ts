@@ -14,7 +14,12 @@ export function get_data<T>() {
 		});
 		eventSource?.addEventListener(STREAM_EVENT, (evt) => {
 			const resolved = JSON.parse(evt.data);
-			resolvers.get(resolved.key)?.resolve(JSON.parse(resolved.value));
+			const resolver = resolvers.get(resolved.key);
+			if (resolved.kind === 'resolve') {
+				resolver?.resolve(JSON.parse(resolved.value));
+			} else {
+				resolver?.reject(JSON.parse(resolved.value));
+			}
 		});
 	});
 	onDestroy(() => {

@@ -7,20 +7,21 @@ This package allows you to transfare Promises over the wire in sveltekit. It use
 Here's an example of what you would write;
 
 **hooks.server.ts**
+
 ```ts
 import { defer_handle } from 'sveltekit-defer';
 import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = defer_handle;
-
 ```
 
 if you have other handles you can chain them with the utility function `sequence` provided by sveltekit.
 
 **hooks.server.ts**
+
 ```ts
 import { defer_handle } from 'sveltekit-defer';
-import { sequence } from "@sveltejs/kit/hooks";
+import { sequence } from '@sveltejs/kit/hooks';
 import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = sequence(defer_handle, your_handle);
@@ -34,62 +35,61 @@ import { defer } from 'sveltekit-defer';
 import type { PageServerLoad } from './$types';
 
 async function get_blog() {
-    await new Promise(r => setTimeout(r, 7000));
-    return "A long blog post that it's very critical so the user need to see it right away";
+	await new Promise((r) => setTimeout(r, 7000));
+	return "A long blog post that it's very critical so the user need to see it right away";
 }
 
 async function get_comments() {
-    await new Promise(r => setTimeout(r, 10000));
-    return [
-        { author: "Antonio", comment: "Very cool" },
-        { author: "Oskar", comment: "Yeah it's wonderful" },
-    ];
+	await new Promise((r) => setTimeout(r, 10000));
+	return [
+		{ author: 'Antonio', comment: 'Very cool' },
+		{ author: 'Oskar', comment: "Yeah it's wonderful" }
+	];
 }
 
 /**
  * Wrap you actual load function inside our defer function to unlock the defer functionality
  */
-export const load: PageServerLoad = defer((async (event: ServerLoadEvent) => {
-    // start the fetch for the comments right away without awaiting
-    const comments = get_comments();
-    // await the blog post given that is critical content
-    const blog = await get_blog();
-    //return the promise (comments) and the blog post
-    return {
-        blog,
-        comments,
-    };
-}));
-
+export const load: PageServerLoad = defer(async (event: ServerLoadEvent) => {
+	// start the fetch for the comments right away without awaiting
+	const comments = get_comments();
+	// await the blog post given that is critical content
+	const blog = await get_blog();
+	//return the promise (comments) and the blog post
+	return {
+		blog,
+		comments
+	};
+});
 ```
 
 then on the client side you can access the data via the store provided by `sveltekit-defer`
 
 ```svelte
 <script lang="ts">
-  import { get_data } from "sveltekit-defer";
-  import type { PageData } from "./$types";
+	import { get_data } from 'sveltekit-defer';
+	import type { PageData } from './$types';
 
-  const data = get_data<PageData>();
+	const data = get_data<PageData>();
 </script>
 
 <main>
-  <section>
-    <!--The blog will be available right away-->
-    {$data.blog}
-  </section>
-  <section>
-    <ul>
-      <!--await the comments because they are a Promise-->
-      {#await $data.comments}
-        Loading...
-      {:then comments}
-        {#each comments as comment}
-          <li>{comment.author} - {comment.comment}</li>
-        {/each}
-      {/await}
-    </ul>
-  </section>
+	<section>
+		<!--The blog will be available right away-->
+		{$data.blog}
+	</section>
+	<section>
+		<ul>
+			<!--await the comments because they are a Promise-->
+			{#await $data.comments}
+				Loading...
+			{:then comments}
+				{#each comments as comment}
+					<li>{comment.author} - {comment.comment}</li>
+				{/each}
+			{/await}
+		</ul>
+	</section>
 </main>
 ```
 

@@ -1,6 +1,13 @@
 import type { ServerLoadEvent } from '@sveltejs/kit';
 import { COOKIE_NAME, STREAM_PATHNAME } from './constants';
 
+function pushEvent(event: ServerLoadEvent, data: any) {
+	event.fetch(`${STREAM_PATHNAME}?load=${event.url}`, {
+		method: 'POST',
+		body: JSON.stringify(data)
+	});
+}
+
 export function defer<T extends (...args: any[]) => any>(
 	func: T
 ): (event: ServerLoadEvent) => Promise<ReturnType<T>> {
@@ -20,12 +27,13 @@ export function defer<T extends (...args: any[]) => any>(
 					returnVal.promises = [];
 				}
 				returnVal.promises.push(key);
-				returnVal[key].then((res: any) => {
-					event.fetch(`${STREAM_PATHNAME}?load=${event.url}`, {
-						method: 'POST',
-						body: JSON.stringify({ value: JSON.stringify(res), key })
+				returnVal[key]
+					.then((res: any) => {
+						pushEvent(event, { value: JSON.stringify(res), key, kind: 'resolve' });
+					})
+					.catch((error: any) => {
+						pushEvent(event, { value: JSON.stringify(error), key, kind: 'reject' });
 					});
-				});
 				returnVal[key] = '__PROMISE_TO_DEFER__';
 			}
 		});
