@@ -18,6 +18,10 @@ type Transform<T> = {
 	promises: GetPromises<T>[];
 };
 
+function get_promise_or_throw(promise: Promise<any>) {
+	return Promise.race([promise, Promise.reject()]);
+}
+
 export function defer<T extends (...args: any[]) => any>(
 	func: T
 ): (event: ServerLoadEvent) => Promise<Transform<Awaited<ReturnType<T>>>> {
@@ -30,23 +34,29 @@ export function defer<T extends (...args: any[]) => any>(
 			});
 		}
 		const returnVal = await func(event);
-		Object.keys(returnVal as any).forEach(async (_key) => {
+		const keys = Object.keys(returnVal as any);
+		for (const _key of keys) {
 			const key = _key as keyof typeof returnVal;
 			if ((returnVal as any)[key] instanceof Promise) {
-				if (!returnVal.promises) {
-					returnVal.promises = [];
+				try {
+					const actualValue = await get_promise_or_throw(returnVal[key]);
+					returnVal[key] = actualValue;
+				} catch (e) {
+					if (!returnVal.promises) {
+						returnVal.promises = [];
+					}
+					returnVal.promises.push(key);
+					returnVal[key]
+						.then((res: any) => {
+							pushEvent(event, { value: JSON.stringify(res), key, kind: 'resolve' });
+						})
+						.catch((error: any) => {
+							pushEvent(event, { value: JSON.stringify(error), key, kind: 'reject' });
+						});
+					returnVal[key] = '__PROMISE_TO_DEFER__';
 				}
-				returnVal.promises.push(key);
-				returnVal[key]
-					.then((res: any) => {
-						pushEvent(event, { value: JSON.stringify(res), key, kind: 'resolve' });
-					})
-					.catch((error: any) => {
-						pushEvent(event, { value: JSON.stringify(error), key, kind: 'reject' });
-					});
-				returnVal[key] = '__PROMISE_TO_DEFER__';
 			}
-		});
+		}
 		return returnVal;
 	};
 }
