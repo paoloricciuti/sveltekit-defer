@@ -36,7 +36,11 @@
 	},
 	"peerDependencies": {
 		"@sveltejs/kit": "^1.0.0",
-		"svelte": "^3.54.0"
+		"svelte": "^3.54.0",
+		"devalue": "^4.2.3"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"devalue": "^4.2.3"
+	}
 }
