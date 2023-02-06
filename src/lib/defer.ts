@@ -8,9 +8,19 @@ function pushEvent(event: ServerLoadEvent, data: any) {
 	});
 }
 
+type GetPromises<T> = {
+	[Key in keyof T]: T[Key] extends Promise<any> ? Key : never;
+}[keyof T];
+
+type Transform<T> = {
+	[Key in keyof T]: T[Key];
+} & {
+	promises: GetPromises<T>[];
+};
+
 export function defer<T extends (...args: any[]) => any>(
 	func: T
-): (event: ServerLoadEvent) => Promise<ReturnType<T>> {
+): (event: ServerLoadEvent) => Promise<Transform<Awaited<ReturnType<T>>>> {
 	return async (event: ServerLoadEvent) => {
 		if (!event.cookies.get(COOKIE_NAME)) {
 			event.cookies.set(COOKIE_NAME, crypto.randomUUID(), {

@@ -3,7 +3,14 @@ import { onDestroy, onMount } from 'svelte';
 import { derived, get } from 'svelte/store';
 import { STREAM_EVENT, STREAM_PATHNAME } from './constants';
 
-export function get_data<T>() {
+type TransformBack<T extends { promises: string[] }> = Omit<
+	{
+		[Key in keyof T]: [Key] extends T['promises'] ? Promise<T[Key]> : T[Key];
+	},
+	'promises'
+>;
+
+export function get_data<T extends { promises: string[] }>() {
 	const resolvers: Map<string, { resolve: (arg: any) => void; reject: (arg: any) => void }> =
 		new Map();
 	let eventSource: EventSource;
@@ -25,7 +32,7 @@ export function get_data<T>() {
 	onDestroy(() => {
 		eventSource?.close();
 	});
-	const retval = derived<typeof page, T>(page, ($page) => {
+	const retval = derived<typeof page, TransformBack<T>>(page, ($page) => {
 		const data = $page.data;
 		const { promises = [] } = data;
 		resolvers.clear();
@@ -38,7 +45,7 @@ export function get_data<T>() {
 			}
 		});
 		delete data.promises;
-		return data as T;
+		return data as TransformBack<T>;
 	});
 
 	return retval;
