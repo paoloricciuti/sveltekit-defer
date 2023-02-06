@@ -2,6 +2,17 @@ import { page } from '$app/stores';
 import { onDestroy, onMount } from 'svelte';
 import { derived, get } from 'svelte/store';
 import { STREAM_EVENT, STREAM_PATHNAME } from './constants';
+import * as devalue from 'devalue';
+
+function parse(value: any) {
+	let ret;
+	try {
+		ret = devalue.parse(value);
+	} catch (e) {
+		ret = JSON.parse(value);
+	}
+	return ret;
+}
 
 type TransformBack<T extends { promises: string[] }> = Omit<
 	{
@@ -23,9 +34,9 @@ export function get_data<T extends { promises: string[] }>() {
 			const resolved = JSON.parse(evt.data);
 			const resolver = resolvers.get(resolved.key);
 			if (resolved.kind === 'resolve') {
-				resolver?.resolve(JSON.parse(resolved.value));
+				resolver?.resolve(parse(resolved.value));
 			} else {
-				resolver?.reject(JSON.parse(resolved.value));
+				resolver?.reject(parse(resolved.value));
 			}
 		});
 	});
