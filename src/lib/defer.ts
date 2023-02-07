@@ -1,9 +1,9 @@
 import type { ServerLoadEvent } from '@sveltejs/kit';
-import { COOKIE_NAME, STREAM_PATHNAME } from './constants';
+import { env, type PromisesField } from './constants';
 import * as devalue from 'devalue';
 
 function pushEvent(event: ServerLoadEvent, data: any) {
-	event.fetch(`${STREAM_PATHNAME}?load=${event.url}`, {
+	event.fetch(`${env.stream_pathname}?load=${event.url}`, {
 		method: 'POST',
 		body: JSON.stringify(data)
 	});
@@ -16,7 +16,7 @@ type GetPromises<T> = {
 type Transform<T> = {
 	[Key in keyof T]: T[Key];
 } & {
-	promises: GetPromises<T>[];
+	[K in PromisesField]: GetPromises<T>[];
 };
 
 function get_promise_or_throw(promise: Promise<any>) {
@@ -37,8 +37,8 @@ export function defer<T extends (...args: any[]) => any>(
 	func: T
 ): (event: ServerLoadEvent) => Promise<Transform<Awaited<ReturnType<T>>>> {
 	return async (event: ServerLoadEvent) => {
-		if (!event.cookies.get(COOKIE_NAME)) {
-			event.cookies.set(COOKIE_NAME, crypto.randomUUID(), {
+		if (!event.cookies.get(env.cookie_name)) {
+			event.cookies.set(env.cookie_name, crypto.randomUUID(), {
 				path: '/',
 				httpOnly: true,
 				secure: true
@@ -53,10 +53,10 @@ export function defer<T extends (...args: any[]) => any>(
 					const actualValue = await get_promise_or_throw(returnVal[key]);
 					returnVal[key] = actualValue;
 				} catch (e) {
-					if (!returnVal.promises) {
-						returnVal.promises = [];
+					if (!returnVal[env.promise_field]) {
+						returnVal[env.promise_field] = [];
 					}
-					returnVal.promises.push(key);
+					returnVal[env.promise_field].push(key);
 					returnVal[key]
 						.then((res: any) => {
 							pushEvent(event, { value: stringify(res), key, kind: 'resolve' });

@@ -93,6 +93,32 @@ then on the client side you can access the data via the store provided by `svelt
 </main>
 ```
 
+## Configuration
+
+`sveltekit-defer` makes use of apis that require to choose a name for them (e.g we need to create a couple of endpoints, an event name, a field to store the deferred promises etc etc). We tryed to chose unique enaugh names so that they should never collide with your applications but you know what they say and the internet is a vast enaugh place to encounter the weirdest circumstances. To avoid this `sveltekit-defer` provide a custom vite plugin to override those names.
+
+```ts
+import { sveltekit } from '@sveltejs/kit/vite';
+import { sveltekit_defer } from 'sveltekit-defer/vite';
+import type { UserConfig } from 'vite';
+
+const config: UserConfig = {
+	plugins: [
+		sveltekit_defer({
+			cookie_name: 'your_cookie_name',
+			stream_event: 'your_stream_event',
+			stream_pathname: '/your_pathname', //this should start with a / but don't worry, if you don't we take care of it
+			promise_field: 'your_promise_field'
+		}),
+		sveltekit()
+	]
+};
+
+export default config;
+```
+
+Make sure to put this plugin before the `sveltekit` one.
+
 ## How it works?
 
 Here's how it works:

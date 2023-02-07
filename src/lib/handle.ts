@@ -1,5 +1,5 @@
 import type { Handle } from '@sveltejs/kit';
-import { COOKIE_NAME, STREAM_EVENT, STREAM_PATHNAME } from './constants';
+import { env } from './constants';
 
 const controllers = new Map<string, ReadableStreamController<any>>();
 const queued = new Map<string, ((controller: ReadableStreamController<any>) => void)[]>();
@@ -7,7 +7,7 @@ const queued = new Map<string, ((controller: ReadableStreamController<any>) => v
 async function enqueue(request: Request, key: string) {
 	const controller = controllers.get(key);
 	const data = await request.clone().text();
-	const to_write = `event: ${STREAM_EVENT}\ndata: ${data}\n\n`;
+	const to_write = `event: ${env.stream_event}\ndata: ${data}\n\n`;
 	const flush = (controller: ReadableStreamController<any>) => {
 		const encoder = new TextEncoder();
 		controller.enqueue(encoder.encode(to_write));
@@ -31,8 +31,8 @@ async function enqueue(request: Request, key: string) {
 
 export const defer_handle: Handle = async ({ event, resolve }) => {
 	const { searchParams, pathname } = new URL(event.request.url);
-	if (pathname === STREAM_PATHNAME) {
-		const defer_user = event.cookies.get(COOKIE_NAME);
+	if (pathname === env.stream_pathname) {
+		const defer_user = event.cookies.get(env.cookie_name);
 		const load = searchParams.get('load') ?? '';
 		const key = [defer_user, load].toString();
 		if (!defer_user) {
