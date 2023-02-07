@@ -95,6 +95,8 @@ then on the client side you can access the data via the store provided by `svelt
 
 ## Configuration
 
+> **WARNING** right now using the configuration plugin breaks in dev mode.
+
 `sveltekit-defer` makes use of apis that require to choose a name for them (e.g we need to create a couple of endpoints, an event name, a field to store the deferred promises etc etc). We tryed to chose unique enaugh names so that they should never collide with your applications but you know what they say and the internet is a vast enaugh place to encounter the weirdest circumstances. To avoid this `sveltekit-defer` provide a custom vite plugin to override those names.
 
 ```ts
