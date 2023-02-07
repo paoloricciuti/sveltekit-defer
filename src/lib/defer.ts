@@ -16,8 +16,8 @@ type GetPromises<T> = {
 type Transform<T> = {
 	[Key in keyof T]: T[Key];
 } & {
-		[K in PromisesField]: GetPromises<T>[];
-	};
+	[K in PromisesField]: GetPromises<T>[];
+};
 
 function get_promise_or_throw(promise: Promise<any>) {
 	return Promise.race([promise, Promise.reject()]);

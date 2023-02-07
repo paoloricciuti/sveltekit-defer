@@ -21,8 +21,8 @@ type TransformBack<T extends { [K in PromisesField]: string[] }> = Omit<
 	PromisesField
 >;
 
-export function get_data<T extends { [K in PromisesField]: string[]; }>() {
-	const resolvers: Map<string, { resolve: (arg: any) => void; reject: (arg: any) => void; }> =
+export function get_data<T extends { [K in PromisesField]: string[] }>() {
+	const resolvers: Map<string, { resolve: (arg: any) => void; reject: (arg: any) => void }> =
 		new Map();
 	let eventSource: EventSource;
 	onMount(() => {

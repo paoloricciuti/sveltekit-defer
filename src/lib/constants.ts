@@ -3,14 +3,16 @@ export const env = {
 	cookie_name: 'sveltekit-defer-user',
 	stream_pathname: '/__sveltekit-defer-events',
 	stream_event: 'sveltekit-defer-resolved',
-	promise_field: '__sveltekit-defer-promises',
+	promise_field: '__sveltekit-defer-promises'
 } as const;
 
+export type Env = typeof env;
+
 export type SveltekitDeferOptions = {
-	-readonly [K in keyof typeof env]?: LiteralToPrimitive<typeof env[K]>
+	-readonly [K in keyof Env]?: LiteralToPrimitive<Env[K]>;
 };
 
-export type PromisesField = typeof env["promise_field"];
+export type PromisesField = Env['promise_field'];
 
 /*
 MIT License
@@ -41,6 +43,6 @@ type LiteralToPrimitive<T> = T extends number
 	? LiteralToPrimitive<T[number]>[]
 	: T extends object
 	? {
-		[K in keyof T]: LiteralToPrimitive<T[K]>
-	}
+			[K in keyof T]: LiteralToPrimitive<T[K]>;
+	  }
 	: never;
