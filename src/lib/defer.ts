@@ -1,5 +1,5 @@
 import type { ServerLoadEvent } from '@sveltejs/kit';
-import { env } from './constants';
+import { env, type PromisesField } from './constants';
 import * as devalue from 'devalue';
 
 function pushEvent(event: ServerLoadEvent, data: any) {
@@ -16,8 +16,8 @@ type GetPromises<T> = {
 type Transform<T> = {
 	[Key in keyof T]: T[Key];
 } & {
-	promises: GetPromises<T>[];
-};
+		[K in PromisesField]: GetPromises<T>[];
+	};
 
 function get_promise_or_throw(promise: Promise<any>) {
 	return Promise.race([promise, Promise.reject()]);
@@ -53,10 +53,10 @@ export function defer<T extends (...args: any[]) => any>(
 					const actualValue = await get_promise_or_throw(returnVal[key]);
 					returnVal[key] = actualValue;
 				} catch (e) {
-					if (!returnVal.promises) {
-						returnVal.promises = [];
+					if (!returnVal[env.promise_field]) {
+						returnVal[env.promise_field] = [];
 					}
-					returnVal.promises.push(key);
+					returnVal[env.promise_field].push(key);
 					returnVal[key]
 						.then((res: any) => {
 							pushEvent(event, { value: stringify(res), key, kind: 'resolve' });
