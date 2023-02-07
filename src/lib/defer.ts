@@ -1,9 +1,9 @@
 import type { ServerLoadEvent } from '@sveltejs/kit';
-import { COOKIE_NAME, STREAM_PATHNAME } from './constants';
+import { env } from './constants';
 import * as devalue from 'devalue';
 
 function pushEvent(event: ServerLoadEvent, data: any) {
-	event.fetch(`${STREAM_PATHNAME}?load=${event.url}`, {
+	event.fetch(`${env.stream_pathname}?load=${event.url}`, {
 		method: 'POST',
 		body: JSON.stringify(data)
 	});
@@ -37,8 +37,8 @@ export function defer<T extends (...args: any[]) => any>(
 	func: T
 ): (event: ServerLoadEvent) => Promise<Transform<Awaited<ReturnType<T>>>> {
 	return async (event: ServerLoadEvent) => {
-		if (!event.cookies.get(COOKIE_NAME)) {
-			event.cookies.set(COOKIE_NAME, crypto.randomUUID(), {
+		if (!event.cookies.get(env.cookie_name)) {
+			event.cookies.set(env.cookie_name, crypto.randomUUID(), {
 				path: '/',
 				httpOnly: true,
 				secure: true

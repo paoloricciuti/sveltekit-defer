@@ -36,11 +36,13 @@
 	},
 	"peerDependencies": {
 		"@sveltejs/kit": "^1.0.0",
-		"svelte": "^3.54.0",
-		"devalue": "^4.2.3"
+		"devalue": "^4.2.3",
+		"magic-string": "^0.27.0",
+		"svelte": "^3.54.0"
 	},
 	"type": "module",
 	"dependencies": {
-		"devalue": "^4.2.3"
+		"devalue": "^4.2.3",
+		"magic-string": "^0.27.0"
 	}
 }

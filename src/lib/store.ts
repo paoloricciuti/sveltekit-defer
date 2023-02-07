@@ -1,7 +1,7 @@
 import { page } from '$app/stores';
 import { onDestroy, onMount } from 'svelte';
 import { derived, get } from 'svelte/store';
-import { STREAM_EVENT, STREAM_PATHNAME } from './constants';
+import { env } from './constants';
 import * as devalue from 'devalue';
 
 function parse(value: any) {
@@ -27,10 +27,10 @@ export function get_data<T extends { promises: string[] }>() {
 	let eventSource: EventSource;
 	onMount(() => {
 		const $page = get(page);
-		eventSource = new EventSource(`${STREAM_PATHNAME}?load=${$page.url.href}`, {
+		eventSource = new EventSource(`${env.stream_pathname}?load=${$page.url.href}`, {
 			withCredentials: true
 		});
-		eventSource?.addEventListener(STREAM_EVENT, (evt) => {
+		eventSource?.addEventListener(env.stream_event, (evt) => {
 			const resolved = JSON.parse(evt.data);
 			const resolver = resolvers.get(resolved.key);
 			if (resolved.kind === 'resolve') {
