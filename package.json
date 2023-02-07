@@ -1,6 +1,6 @@
 {
 	"name": "sveltekit-defer",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"repository": "git+https://github.com/paoloricciuti/sveltekit-defer.git",
 	"author": "Paolo Ricciuti",
 	"license": "MIT",
