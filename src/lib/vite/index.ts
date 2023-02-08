@@ -44,7 +44,7 @@ export function sveltekit_defer(options: SveltekitDeferOptions): Plugin {
 					esbuildOptions: {
 						plugins: [
 							{
-								name: 'esbuild-plugin',
+								name: 'esbuild-plugin-fix-constants',
 								setup(build) {
 									build.onLoad(
 										{
