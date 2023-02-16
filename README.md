@@ -130,6 +130,10 @@ Here's how it works:
 1. A new event is put out from the server sent event endpoint
 1. The callback registered in the store fires and the store resolves the correct Promise giving you back the data.
 
+Here's a simple flow diagram to depict this
+
+![](https://raw.githubusercontent.com/paoloricciuti/sveltekit-defer/master/.github/flow.png)
+
 ## What to do now?
 
 There's a lot to do, but the first thing is to make sure that this doesn't create some super-huge security/performance issue and generally if there are things that can be done better.
