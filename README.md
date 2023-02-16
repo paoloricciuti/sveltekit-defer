@@ -132,7 +132,8 @@ Here's how it works:
 
 Here's a simple flow diagram to depict this
 
-![](https://raw.githubusercontent.com/paoloricciuti/sveltekit-defer/master/.github/flow.png)
+![](https://raw.githubusercontent.com/paoloricciuti/sveltekit-defer/master/.github/flow.png#gh-light-mode-only)
+![](https://raw.githubusercontent.com/paoloricciuti/sveltekit-defer/master/.github/dark_flow.png#gh-dark-mode-only)
 
 ## What to do now?
 
