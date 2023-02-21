@@ -1,3 +1,5 @@
+> **Warning** Since this project Sveltekit has proper support for the defer api. This package is hereby deprecated. See [the official documentation](https://kit.svelte.dev/docs/load#streaming-with-promises) to know how to stream in Sveltekit.
+
 # sveltekit-defer
 
 ⚠ This is extremely WIP
